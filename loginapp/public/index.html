@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+</head>
+<body>
+    <form id="loginForm">
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <button type="submit">Login</button>
+        <div id="error"></div>
+        <div id="success"></div>
+    </form>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            if (!email || !password) {
+                document.getElementById('error').innerText = 'both fields are required';
+                return;
+            }
+            if (!email.includes('@')) {
+                document.getElementById('error').innerText = 'invalid email address';
+                return;
+            }
+            if (password.length < 8) {
+                document.getElementById('error').innerText = 'password needs to be at least 8 charecters';
+                return;
+            }
+
+            document.getElementById('error').innerText = '';
+            document.getElementById('success').innerText = '';
+
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    document.getElementById('success').innerText = data.message;
+                } else {
+                    document.getElementById('error').innerText = data.error;
+                }
+            } catch (err) {
+                document.getElementById('error').innerText = 'Server error';
+            }
+        });
+    </script>
+</body>
+</html>
